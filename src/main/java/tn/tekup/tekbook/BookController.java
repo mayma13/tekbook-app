@@ -10,7 +10,7 @@ import java.util.Map;
 public class BookController {
 
     // Modifiez ce texte a l etape 1 et a l etape 2 pour invalider le cache Docker.
-    private static final String MESSAGE = "TekBook — plateforme de reservation";
+    private static final String MESSAGE = "TekBook — plateforme de reservation mayma2";
 
     @GetMapping("/")
     public Map<String, String> accueil() {
