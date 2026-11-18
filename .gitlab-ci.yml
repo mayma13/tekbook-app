@@ -1,0 +1,38 @@
+stages:
+  - security
+  - dast
+
+semgrep_scan:
+  stage: security
+  image:
+    name: semgrep/semgrep:latest
+    entrypoint: [""]
+  allow_failure: false
+  script:
+    - semgrep --version
+    - >-
+      semgrep scan --config tekbook-rules.yml --error
+      --metrics=off --json --output semgrep-report.json .
+  artifacts:
+    when: always
+    paths: [semgrep-report.json]
+
+dast_baseline:
+  stage: dast
+  image:
+    name: ghcr.io/zaproxy/zaproxy:stable
+    entrypoint: [""]
+  allow_failure: false
+  script:
+    - test -n "$STAGING_URL"
+    - mkdir -p /zap/wrk
+    - zap-baseline.py -t "$STAGING_URL" -r zap-baseline.html
+  after_script:
+    - |
+      if [ -f /zap/wrk/zap-baseline.html ]; then
+        cp /zap/wrk/zap-baseline.html "$CI_PROJECT_DIR/"
+      fi
+  artifacts:
+    when: always
+    paths: [zap-baseline.html]
+    expire_in: 1 week
