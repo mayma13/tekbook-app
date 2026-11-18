@@ -1,0 +1,19 @@
+name: security
+on: [push]
+
+jobs:
+  semgrep_scan:
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: semgrep --version
+      - run: >-
+          semgrep scan --config tekbook-rules.yml
+          --metrics=off --json --output semgrep-report.json .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semgrep-report
+          path: semgrep-report.json
